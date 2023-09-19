@@ -1,4 +1,9 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
+	import designSwirl from '$lib/assets/pattern-noise.svg?raw';
+	import designTest from '$lib/assets/pattern-test.svg?raw';
+
 	type Color = {
 		hex: string;
 		picked: boolean;
@@ -6,13 +11,16 @@
 
 	type Design = {
 		name: string;
-		svg: string;
+		svg: HTMLElement | null;
+		svgUrl: string;
 		picked: boolean;
+		allPaths?: SVGPathElement[];
+		pathsWithFill?: SVGPathElement[];
+		pathsWithOutline?: SVGPathElement[];
 	};
 
 	const version = '0.0.1';
 	const threadColorCap = 3;
-	let pickedColors = 0;
 
 	let threadColors: Color[] = [
 		{ hex: '#000000', picked: false },
@@ -29,15 +37,69 @@
 
 	let designs: Design[] = [
 		{
-			name: 'classic',
-			svg: `todo`,
+			name: 'test',
+			svg: null,
+			svgUrl: designTest,
 			picked: true
 		},
-		{ name: 'swirl', svg: 'TODO ', picked: false }
+		{ name: 'swirl', svg: null, svgUrl: designSwirl, picked: false }
 	];
-	$: pickedDesign = designs[0];
+	let pickedDesign = designs[0];
+	let initFlag = false;
 
-	$: varAmount = pickedColors; // ** (pathsWithFill.length + pathsWithOutline.length);
+	let pickedColors = 0;
+	let totalPaths = 0; // pathsWithFill + pathsWithOutline
+	$: varAmount = pickedColors ** totalPaths;
+
+	onMount(() => {
+		// initialize all designs with the svg element
+		designs.forEach((design) => {
+			design.svg = parseSvg(design.svgUrl);
+
+			// process the svg and separate the paths
+			separatePaths(design);
+		});
+
+		// set the first design as picked
+		pickDesign(designs[0]);
+
+		// allow rendering of designs and buttons
+		initFlag = true;
+	});
+
+	// creates a svg element from a string
+	function parseSvg(svg: string): HTMLElement {
+		const parser = new DOMParser();
+		const svgParsed = parser.parseFromString(svg, 'image/svg+xml').documentElement;
+
+		return svgParsed;
+	}
+
+	function pickDesign(design: Design) {
+		// set all designs to unpicked
+		designs.forEach((d) => (d.picked = false));
+
+		design.picked = true;
+		pickedDesign = design;
+		designs = [...designs];
+
+		// set the total amount of paths
+		if (design.pathsWithFill === undefined || design.pathsWithOutline === undefined) return;
+		totalPaths = design.pathsWithFill.length + design.pathsWithOutline.length;
+	}
+
+	function separatePaths(design: Design) {
+		if (design.svg === null) return;
+		// get all paths with fill and paths with outline
+		const allPaths = Array.from(design.svg.querySelectorAll('path'));
+		const pathsWithFill = allPaths.filter((path) => path.style.fill !== 'none');
+		const pathsWithOutline = allPaths.filter((path) => path.style.stroke);
+
+		// set the paths
+		design.allPaths = allPaths;
+		design.pathsWithFill = pathsWithFill;
+		design.pathsWithOutline = pathsWithOutline;
+	}
 
 	function clickThreadColor(color: Color) {
 		// if the color is already picked, remove it
@@ -73,18 +135,9 @@
 		color.picked = true;
 		fabricColors = [...fabricColors];
 	}
-
-	function clickDesignButton(design: Design) {
-		// unselect all other designs
-		designs.forEach((d) => (d.picked = false));
-
-		design.picked = true;
-		pickedDesign = design;
-		designs = [...designs];
-	}
 </script>
 
-<h1>SCYTHE Design Generator</h1>
+<h1>D Generator</h1>
 <p>version: {version}</p>
 <p>This will generate {varAmount} variations</p>
 
@@ -123,17 +176,20 @@
 		<h2>Design</h2>
 		<div class="design-pick">
 			{#each designs as design}
-				<button on:click={() => clickDesignButton(design)} class:active={design.picked}
+				<button on:click={() => pickDesign(design)} class:active={design.picked}
 					>{design.name.toUpperCase()}</button
 				>
 			{/each}
 		</div>
-		<div>
-			{pickedDesign.svg}
-		</div>
+		{#if initFlag}
+			<div>
+				{@html pickedDesign.svg?.outerHTML}
+			</div>
+		{/if}
 	</div>
-
-	<button id="generate">GENERATE</button>
+	<div class="button-tile">
+		<button id="generate" disabled={varAmount === 0}>GENERATE</button>
+	</div>
 </section>
 <div class="big-tile" id="results">
 	<h2>Results</h2>
@@ -214,6 +270,12 @@
 		font-weight: bold;
 	}
 
+	.button-tile {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	#generate {
 		padding: 1rem;
 		background-color: var(--col-cornsilk);
@@ -222,9 +284,13 @@
 		font-size: 1.5rem;
 		border: none;
 		box-sizing: border-box;
+
+		margin-top: 2rem;
+		margin-bottom: 2rem;
 	}
 
-	#generate:hover {
+	#generate:hover,
+	#generate:disabled {
 		background-color: var(--col-cornsilk-transp);
 	}
 
