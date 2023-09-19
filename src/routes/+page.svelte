@@ -19,6 +19,11 @@
 		pathsWithOutline?: SVGPathElement[];
 	};
 
+	type Result = {
+		name: string;
+		svg: HTMLElement;
+	};
+
 	const version = '0.0.1';
 	const threadColorCap = 3;
 
@@ -50,6 +55,8 @@
 	let pickedColors = 0;
 	let totalPaths = 0; // pathsWithFill + pathsWithOutline
 	$: varAmount = pickedColors ** totalPaths;
+
+	let results: Result[] = [];
 
 	onMount(() => {
 		// initialize all designs with the svg element
@@ -135,6 +142,64 @@
 		color.picked = true;
 		fabricColors = [...fabricColors];
 	}
+
+	function generateNewDesigns() {
+		// create all possible color variations
+		const pickedColors = threadColors.filter((c) => c.picked).map((c) => c.hex);
+		let colorVariations: string[][] = [];
+		recurseVariations([], totalPaths, pickedColors, colorVariations);
+
+		// generate new designs
+		let newResults: Result[] = [];
+		const pickedSvg = pickedDesign.svg;
+
+		colorVariations.forEach((variation) => {
+			const newSvg = pickedSvg?.cloneNode(true) as HTMLElement;
+			const newSvgPaths = newSvg.querySelectorAll('path');
+
+			let colorIndex = 0;
+			// set the outline and fill colors of the paths
+			for (const path of newSvgPaths) {
+				const hasFill = path.style.fill && path.style.fill !== 'none';
+				if (hasFill) {
+					path.style.fill = variation[colorIndex];
+					colorIndex++;
+				}
+
+				const hasOutline = path.style.stroke && path.style.stroke !== 'none';
+				if (hasOutline) {
+					path.style.stroke = variation[colorIndex];
+					colorIndex++;
+				}
+			}
+			// set the svg background color
+			const pickedFabricColor = fabricColors.find((c) => c.picked);
+			if (pickedFabricColor) {
+				newSvg.style.backgroundColor = pickedFabricColor.hex;
+			}
+
+			newResults.push({ name: variation.join(','), svg: newSvg });
+		});
+
+		results = newResults;
+	}
+
+	function recurseVariations(
+		currentVariation: string[],
+		remainingLength: number,
+		colors: string[],
+		variations: string[][]
+	) {
+		if (remainingLength === 0) {
+			variations.push(currentVariation);
+			return;
+		}
+
+		for (const color of colors) {
+			let extendedVariation = [...currentVariation, color];
+			recurseVariations(extendedVariation, remainingLength - 1, colors, variations);
+		}
+	}
 </script>
 
 <h1>D Generator</h1>
@@ -188,11 +253,19 @@
 		{/if}
 	</div>
 	<div class="button-tile">
-		<button id="generate" disabled={varAmount === 0}>GENERATE</button>
+		<button on:click={() => generateNewDesigns()} id="generate" disabled={varAmount === 0}
+			>GENERATE</button
+		>
 	</div>
 </section>
 <div class="big-tile" id="results">
 	<h2>Results</h2>
+	{#each results as result}
+		<div>
+			<p>{result.name}</p>
+			{@html result.svg.outerHTML}
+		</div>
+	{/each}
 </div>
 
 <style>
