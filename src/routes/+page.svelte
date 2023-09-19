@@ -3,6 +3,7 @@
 
 	import designSwirl from '$lib/assets/pattern-noise.svg?raw';
 	import designTest from '$lib/assets/pattern-test.svg?raw';
+	import crossIcon from '$lib/assets/icons/ic-cross.svg';
 
 	type Color = {
 		hex: string;
@@ -24,7 +25,7 @@
 		svg: HTMLElement;
 	};
 
-	const version = '0.0.1';
+	const version = '0.1.0';
 	const threadColorCap = 3;
 
 	let threadColors: Color[] = [
@@ -202,7 +203,7 @@
 	}
 </script>
 
-<h1>D Generator</h1>
+<h1>Scythe Design Generator</h1>
 <p>version: {version}</p>
 <p>This will generate {varAmount} variations</p>
 
@@ -219,7 +220,9 @@
 					class="color-tile"
 					class:picked={color.picked}
 					style="background-color: {color.hex};"
-				/>
+				>
+					<img src={crossIcon} alt="cross" />
+				</button>
 			{/each}
 		</div>
 	</div>
@@ -232,7 +235,9 @@
 					class="color-tile"
 					class:picked={color.picked}
 					style="background-color: {color.hex};"
-				/>
+				>
+					<img src={crossIcon} alt="cross" />
+				</button>
 			{/each}
 		</div>
 	</div>
@@ -258,17 +263,20 @@
 		>
 	</div>
 </section>
-<div class="big-tile" id="results">
+<div class="big-tile">
 	<h2>Results</h2>
-	{#each results as result}
-		<div>
-			<p>{result.name}</p>
-			{@html result.svg.outerHTML}
-		</div>
-	{/each}
+	<div id="results">
+		{#each results as result}
+			<div class="result-container">
+				{@html result.svg.outerHTML}
+			</div>
+		{/each}
+	</div>
 </div>
 
 <style>
+	@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap');
+
 	:root {
 		--col-phlox: #ee00ff;
 		--col-canary: #fff300;
@@ -283,6 +291,7 @@
 		background-color: var(--col-black);
 		color: var(--col-cornsilk);
 		font-size: 16px;
+		font-family: 'IBM Plex Mono', monospace;
 	}
 
 	#setup {
@@ -324,8 +333,25 @@
 		border: 1px solid var(--col-cornsilk);
 	}
 
+	button {
+		font-family: 'IBM Plex Mono', monospace;
+	}
+
 	.picked {
-		border-radius: 25px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	button img {
+		width: 60%;
+		height: 60%;
+		opacity: 0%;
+	}
+
+	.picked img {
+		opacity: 100%;
+		mix-blend-mode: difference;
 	}
 
 	.design-pick {
@@ -375,6 +401,12 @@
 	.design-pick button.active {
 		background-color: var(--col-cornsilk);
 		color: var(--col-black);
+	}
+
+	#results {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 1rem;
 	}
 
 	/* set the amount of columns to 1 on screens narrower than 300px */
