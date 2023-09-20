@@ -3,6 +3,7 @@
 
 	import designSwirl from '$lib/assets/pattern-noise.svg?raw';
 	import designTest from '$lib/assets/pattern-test.svg?raw';
+	import desinClassic from '$lib/assets/pattern-classic.svg?raw';
 	import crossIcon from '$lib/assets/icons/ic-cross.svg';
 
 	type Color = {
@@ -37,17 +38,14 @@
 	];
 	let fabricColors: Color[] = [
 		{ hex: '#f1f1f1', picked: true },
-		{ hex: '#1d1d1d', picked: false },
-		{ hex: '#e2b15f', picked: false }
+		{ hex: '#fcbfb5', picked: false },
+		{ hex: '#e2b15f', picked: false },
+		{ hex: '#000000', picked: false }
 	];
 
 	let designs: Design[] = [
-		{
-			name: 'test',
-			svg: null,
-			svgUrl: designTest,
-			picked: true
-		},
+		{ name: 'test', svg: null, svgUrl: designTest, picked: false },
+		{ name: 'classic', svg: null, svgUrl: desinClassic, picked: false },
 		{ name: 'swirl', svg: null, svgUrl: designSwirl, picked: false }
 	];
 	let pickedDesign = designs[0];
@@ -130,10 +128,8 @@
 	}
 
 	function clickFabricColor(color: Color) {
-		// if the color is already picked, remove it
+		// if the color is do nothing
 		if (color.picked) {
-			color.picked = false;
-			fabricColors = [...fabricColors];
 			return;
 		}
 
@@ -208,11 +204,12 @@
 <p>This will generate {varAmount} variations</p>
 
 <section id="setup">
-	<div class="big-tile">
+	<div class="corner-16">
 		<div class="card-headline">
 			<h2>Thread Colors</h2>
 			<p>picked: {pickedColors}/{threadColorCap}</p>
 		</div>
+		<!-- Thread color picker -->
 		<div class="button-grid">
 			{#each threadColors as color}
 				<button
@@ -220,13 +217,12 @@
 					class="color-tile"
 					class:picked={color.picked}
 					style="background-color: {color.hex};"
-				>
-					<img src={crossIcon} alt="cross" />
-				</button>
+				/>
 			{/each}
 		</div>
 	</div>
-	<div class="big-tile">
+	<!-- Fabric color picker -->
+	<div class="corner-16">
 		<h2>Fabric Color</h2>
 		<div class="button-grid">
 			{#each fabricColors as color}
@@ -235,14 +231,12 @@
 					class="color-tile"
 					class:picked={color.picked}
 					style="background-color: {color.hex};"
-				>
-					<img src={crossIcon} alt="cross" />
-				</button>
+				/>
 			{/each}
 		</div>
 	</div>
-
-	<div class="big-tile">
+	<!-- Design picker -->
+	<div class="corner-16">
 		<h2>Design</h2>
 		<div class="design-pick">
 			{#each designs as design}
@@ -251,8 +245,9 @@
 				>
 			{/each}
 		</div>
+		<!-- design preview -->
 		{#if initFlag}
-			<div>
+			<div class="corner-8">
 				{@html pickedDesign.svg?.outerHTML}
 			</div>
 		{/if}
@@ -263,11 +258,13 @@
 		>
 	</div>
 </section>
-<div class="big-tile">
+<!-- Results tile -->
+<div class="corner-16">
 	<h2>Results</h2>
 	<div id="results">
 		{#each results as result}
-			<div class="result-container">
+			<div class="result-container corner-8">
+				<p>{result.name}</p>
 				{@html result.svg.outerHTML}
 			</div>
 		{/each}
@@ -310,12 +307,7 @@
 		justify-content: space-between;
 	}
 
-	.big-tile {
-		border: 1px solid var(--col-cornsilk);
-		padding: 16px;
-	}
-
-	.big-tile h2 {
+	h2 {
 		margin-top: 0px;
 	}
 
@@ -333,6 +325,32 @@
 		border: 1px solid var(--col-cornsilk);
 	}
 
+	.corner-8 {
+		--s: 8px; /* the size on the corner */
+		--t: 1px; /* the thickness of the border */
+		--g: 8px; /* the gap between the border and element */
+
+		padding: calc(var(--g) + var(--t));
+		outline: var(--t) solid var(--col-cornsilk); /* the color here */
+		outline-offset: calc(-1 * var(--t));
+		-webkit-mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 /
+				calc(100% - var(--s)) calc(100% - var(--s)),
+			linear-gradient(#000 0 0) content-box;
+	}
+
+	.corner-16 {
+		--s: 16px; /* the size on the corner */
+		--t: 1px; /* the thickness of the border */
+		--g: 16px; /* the gap between the border and element */
+
+		padding: calc(var(--g) + var(--t));
+		outline: var(--t) solid var(--col-cornsilk); /* the color here */
+		outline-offset: calc(-1 * var(--t));
+		-webkit-mask: conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 /
+				calc(100% - var(--s)) calc(100% - var(--s)),
+			linear-gradient(#000 0 0) content-box;
+	}
+
 	button {
 		font-family: 'IBM Plex Mono', monospace;
 	}
@@ -341,23 +359,16 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}
 
-	button img {
-		width: 60%;
-		height: 60%;
-		opacity: 0%;
-	}
-
-	.picked img {
-		opacity: 100%;
-		mix-blend-mode: difference;
+		mask: url('$lib/assets/icons/ic-cross.svg');
 	}
 
 	.design-pick {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 		gap: 1rem;
+
+		margin-bottom: 8px;
 	}
 
 	.design-pick button {
@@ -401,6 +412,24 @@
 	.design-pick button.active {
 		background-color: var(--col-cornsilk);
 		color: var(--col-black);
+	}
+
+	.result-container {
+		position: relative;
+	}
+
+	.result-container p {
+		position: absolute;
+		bottom: 0px;
+		left: 0px;
+
+		padding: 16px;
+		margin: 0px;
+		z-index: 10;
+
+		font-size: 8px;
+		color: white;
+		mix-blend-mode: difference;
 	}
 
 	#results {
