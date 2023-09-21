@@ -44,7 +44,7 @@
 	];
 
 	let designs: Design[] = [
-		{ name: 'test', svg: null, svgUrl: designTest, picked: false },
+		// { name: 'test', svg: null, svgUrl: designTest, picked: false },
 		{ name: 'classic', svg: null, svgUrl: desinClassic, picked: false },
 		{ name: 'swirl', svg: null, svgUrl: designSwirl, picked: false }
 	];
