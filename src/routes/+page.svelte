@@ -217,6 +217,7 @@
 					class="color-tile"
 					class:picked={color.picked}
 					style="background-color: {color.hex};"
+					aria-label="color-{color.hex}"
 				/>
 			{/each}
 		</div>
@@ -231,6 +232,7 @@
 					class="color-tile"
 					class:picked={color.picked}
 					style="background-color: {color.hex};"
+					aria-label="color-{color.hex}"
 				/>
 			{/each}
 		</div>
@@ -240,8 +242,10 @@
 		<h2>Design</h2>
 		<div class="design-pick">
 			{#each designs as design}
-				<button on:click={() => pickDesign(design)} class:active={design.picked}
-					>{design.name.toUpperCase()}</button
+				<button
+					on:click={() => pickDesign(design)}
+					class:active={design.picked}
+					aria-label="design-{design.name}">{design.name.toUpperCase()}</button
 				>
 			{/each}
 		</div>
@@ -253,8 +257,11 @@
 		{/if}
 	</div>
 	<div class="button-tile">
-		<button on:click={() => generateNewDesigns()} id="generate" disabled={varAmount === 0}
-			>GENERATE</button
+		<button
+			on:click={() => generateNewDesigns()}
+			id="generate"
+			disabled={varAmount === 0}
+			aria-label="generate">GENERATE</button
 		>
 	</div>
 </section>
