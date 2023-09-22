@@ -361,6 +361,7 @@
 		align-items: center;
 
 		mask: url('$lib/assets/icons/ic-cross.svg');
+		-webkit-mask-image: url('$lib/assets/icons/ic-cross.svg');
 	}
 
 	.design-pick {
