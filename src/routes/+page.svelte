@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 
 	import designSwirl from '$lib/assets/pattern-noise.svg?raw';
+	import designSpiral from '$lib/assets/pattern-spiral.svg?raw';
 	import designTest from '$lib/assets/pattern-test.svg?raw';
 	import desinClassic from '$lib/assets/pattern-classic.svg?raw';
 	import crossIcon from '$lib/assets/icons/ic-cross.svg';
@@ -16,6 +17,7 @@
 		svg: HTMLElement | null;
 		svgUrl: string;
 		picked: boolean;
+		hoodie: boolean;
 		allPaths?: SVGPathElement[];
 		pathsWithFill?: SVGPathElement[];
 		pathsWithOutline?: SVGPathElement[];
@@ -34,19 +36,29 @@
 		{ hex: '#fb00ff', picked: false },
 		{ hex: '#00f0e1', picked: false },
 		{ hex: '#fff900', picked: false },
+		{ hex: '#bcbcbc', picked: false },
+		{ hex: '#150be0', picked: false },
+		{ hex: '#c30be0', picked: false },
+		{ hex: '#f4b53f', picked: false },
+		{ hex: '#890512', picked: false },
+		{ hex: '#053827', picked: false },
+		{ hex: '#e8bc5f', picked: false },
+		{ hex: '#fcd202', picked: false },
 		{ hex: '#e5e5e5', picked: false }
 	];
 	let fabricColors: Color[] = [
 		{ hex: '#f1f1f1', picked: true },
 		{ hex: '#fcbfb5', picked: false },
 		{ hex: '#e2b15f', picked: false },
+		{ hex: '#87a5a3', picked: false },
 		{ hex: '#000000', picked: false }
 	];
 
 	let designs: Design[] = [
 		// { name: 'test', svg: null, svgUrl: designTest, picked: false },
-		{ name: 'classic', svg: null, svgUrl: desinClassic, picked: false },
-		{ name: 'swirl', svg: null, svgUrl: designSwirl, picked: false }
+		{ name: 'classic', svg: null, svgUrl: desinClassic, picked: false, hoodie: false },
+		{ name: 'swirl', svg: null, svgUrl: designSwirl, picked: false, hoodie: false },
+		{ name: 'spiral', svg: null, svgUrl: designSpiral, picked: false, hoodie: true }
 	];
 	let pickedDesign = designs[0];
 	let initFlag = false;
@@ -239,7 +251,12 @@
 	</div>
 	<!-- Design picker -->
 	<div class="corner-16">
-		<h2>Design</h2>
+		<div class="card-headline">
+			<h2>Design</h2>
+			{#if pickedDesign.hoodie}
+				<p>only available for a hoodie</p>
+			{/if}
+		</div>
 		<div class="design-pick">
 			{#each designs as design}
 				<button
