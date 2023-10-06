@@ -28,7 +28,7 @@
 		svg: HTMLElement;
 	};
 
-	const version = '0.1.0';
+	const version = '1.0.0';
 	const threadColorCap = 3;
 
 	let threadColors: Color[] = [
@@ -256,6 +256,9 @@
 			{#if pickedDesign.hoodie}
 				<p>only available for a hoodie</p>
 			{/if}
+			{#if !pickedDesign.hoodie}
+				<p>t-shirt or a hoodie</p>
+			{/if}
 		</div>
 		<div class="design-pick">
 			{#each designs as design}
@@ -467,6 +470,21 @@
 	@media screen and (max-width: 600px) {
 		#setup {
 			grid-template-columns: repeat(1, 1fr);
+		}
+	}
+
+	/* fit the card headline text nicely on smaller layouts */
+	@media screen and (max-width: 850px) {
+		.card-headline {
+			flex-direction: column;
+		}
+
+		.card-headline h2 {
+			margin-bottom: 4px;
+		}
+
+		.card-headline p {
+			margin-bottom: 16px;
 		}
 	}
 </style>
