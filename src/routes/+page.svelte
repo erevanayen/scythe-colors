@@ -48,9 +48,11 @@
 	];
 	let fabricColors: Color[] = [
 		{ hex: '#f1f1f1', picked: true },
-		{ hex: '#fcbfb5', picked: false },
-		{ hex: '#e2b15f', picked: false },
-		{ hex: '#87a5a3', picked: false },
+		{ hex: '#fcefba', picked: false },
+		{ hex: '#2c3d21', picked: false },
+		// { hex: '#fcbfb5', picked: false },
+		// { hex: '#e2b15f', picked: false },
+		// { hex: '#87a5a3', picked: false },
 		{ hex: '#000000', picked: false }
 	];
 
