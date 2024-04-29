@@ -38,6 +38,7 @@
 		{ hex: '#fff900', picked: false },
 		{ hex: '#bcbcbc', picked: false },
 		{ hex: '#150be0', picked: false },
+		{ hex: '#360063', picked: false },
 		{ hex: '#c30be0', picked: false },
 		{ hex: '#f4b53f', picked: false },
 		{ hex: '#890512', picked: false },
